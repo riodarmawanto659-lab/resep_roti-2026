@@ -36,11 +36,17 @@ class DetailResepResource extends Resource
                     ->preload()
                     ->required(),
 
-                Forms\Components\Select::make('bahan_id')
+               
+               Forms\Components\Select::make('bahan_id')
                     ->label('Bahan')
                     ->relationship('bahan', 'nama')
                     ->searchable()
                     ->preload()
+                     ->createOptionForm([
+                 Forms\Components\TextInput::make('nama')
+                    ->required()
+                    ->maxLength(255),
+            ])
                     ->required(),
 
                 Forms\Components\TextInput::make('jumlah')

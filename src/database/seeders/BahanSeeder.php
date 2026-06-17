@@ -11,12 +11,6 @@ class BahanSeeder extends Seeder
     {
         $bahans = [
             ['nama' => 'Tepung Terigu', 'satuan' => 'gram'],
-            ['nama' => 'Gula Pasir', 'satuan' => 'gram'],
-            ['nama' => 'Ragi Instan', 'satuan' => 'gram'],
-            ['nama' => 'Mentega', 'satuan' => 'gram'],
-            ['nama' => 'Susu Cair', 'satuan' => 'ml'],
-            ['nama' => 'Telur', 'satuan' => 'butir'],
-            ['nama' => 'Cokelat Meses', 'satuan' => 'gram'],
         ];
 
         foreach ($bahans as $bahan) {

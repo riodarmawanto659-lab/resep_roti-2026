@@ -169,3 +169,20 @@ document.addEventListener('mousemove', (e)=>{
     glow.style.top = e.clientY + 'px';
 
 });
+
+// Mobile menu toggle
+const mobileBtn = document.getElementById('mobileMenuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+
+if(mobileBtn && mobileMenu){
+    mobileBtn.addEventListener('click', () => {
+        const expanded = mobileBtn.getAttribute('aria-expanded') === 'true';
+        mobileBtn.setAttribute('aria-expanded', String(!expanded));
+        mobileMenu.classList.toggle('hidden');
+        // simple animation
+        if(!mobileMenu.classList.contains('hidden')){
+            mobileMenu.style.opacity = 0;
+            requestAnimationFrame(()=>{ mobileMenu.style.transition = 'opacity .18s ease'; mobileMenu.style.opacity = 1; });
+        }
+    });
+}

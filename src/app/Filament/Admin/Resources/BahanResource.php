@@ -48,6 +48,7 @@ class BahanResource extends Resource
                         'butir' => 'Butir',
                         'bungkus' => 'Bungkus',
                         'buah' => 'Buah',
+                        'secukupnya' => 'secukupnya',
                     ])
                     ->searchable(),
             ]);

@@ -18,23 +18,5 @@ class DetailResepSeeder extends Seeder
             'bahan_id' => Bahan::where('nama', 'Tepung Terigu')->first()->id,
             'jumlah' => '500 gram',
         ]);
-
-        DetailResep::create([
-            'resep_id' => $resep->id,
-            'bahan_id' => Bahan::where('nama', 'Gula Pasir')->first()->id,
-            'jumlah' => '100 gram',
-        ]);
-
-        DetailResep::create([
-            'resep_id' => $resep->id,
-            'bahan_id' => Bahan::where('nama', 'Ragi Instan')->first()->id,
-            'jumlah' => '10 gram',
-        ]);
-
-        DetailResep::create([
-            'resep_id' => $resep->id,
-            'bahan_id' => Bahan::where('nama', 'Mentega')->first()->id,
-            'jumlah' => '75 gram',
-        ]);
     }
 }

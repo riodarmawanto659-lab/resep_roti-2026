@@ -228,3 +228,212 @@ body{
     visibility:hidden;
     transition:.5s;
 }
+
+/* Stitch effect */
+.stitch-wrap{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.stitch-frame{
+    position:relative;
+    padding:18px;
+    background:linear-gradient(180deg,#fffaf3, #fff8ef);
+    border-radius:22px;
+}
+
+.stitch-frame::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    border-radius:22px;
+    padding:6px;
+    -webkit-mask:linear-gradient(#000,#000) content-box, linear-gradient(#000,#000);
+    -webkit-mask-composite: xor;
+    pointer-events:none;
+}
+
+/* Dashed stitch border using repeating-linear-gradient */
+.stitch-frame{
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+    border-radius:22px;
+}
+
+.stitch-frame::after{
+    content:'';
+    position:absolute;
+    inset:8px;
+    border-radius:14px;
+    pointer-events:none;
+    background:repeating-linear-gradient(90deg,#d97706 0 6px, transparent 6px 12px),
+               repeating-linear-gradient(0deg,#d97706 0 6px, transparent 6px 12px);
+    mix-blend-mode:multiply;
+    opacity:.18;
+}
+
+.stitch-frame img{
+    display:block;
+    border-radius:12px;
+}
+
+/* Optional small stitch accent for headings */
+.stitch-accent{
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:999px;
+    background:linear-gradient(90deg,rgba(217,119,6,.08),rgba(245,158,11,.04));
+    border:1px dashed rgba(217,119,6,.18);
+}
+
+/* Stitch dashed border utility */
+.stitch-border{
+    position:relative;
+    padding:18px;
+    border-radius:18px;
+    background:linear-gradient(180deg,#fff,#fffaf8);
+}
+
+.stitch-border::before{
+    content:'';
+    position:absolute;
+    inset:6px;
+    border-radius:12px;
+    pointer-events:none;
+    box-shadow:0 6px 20px rgba(0,0,0,.06) inset;
+}
+
+.stitch-border .card-inner{
+    background:transparent;
+}
+
+/* Make feature cards look stitched */
+.feature-card{
+    border:2px dashed rgba(217,119,6,.12);
+    background:linear-gradient(180deg, #fff, #fffaf3);
+}
+
+/* Small decorative stitches on image corners */
+.stitch-corner{
+    position:absolute;
+    width:18px;
+    height:6px;
+    background:linear-gradient(90deg,#d97706,#f59e0b);
+    border-radius:4px;
+    opacity:.95;
+}
+
+.stitch-corner.top-left{ top:12px; left:12px; transform:rotate(-20deg); }
+.stitch-corner.bottom-right{ bottom:12px; right:12px; transform:rotate(20deg); }
+
+/* Button subtle stitch outline */
+.btn-bakery{
+    position:relative;
+}
+
+.btn-bakery::after{
+    content:'';
+    position:absolute;
+    inset:3px;
+    border-radius:12px;
+    border:1px dashed rgba(255,255,255,.15);
+    pointer-events:none;
+}
+
+/* Navbar / Links */
+.nav-link{
+    position:relative;
+    color:var(--dark);
+    padding:8px 12px;
+    border-radius:8px;
+    transition:all .25s ease;
+}
+.nav-link:hover{
+    transform:translateY(-2px);
+    background:linear-gradient(90deg, rgba(245,158,11,.06), rgba(217,119,6,.03));
+}
+.nav-link::after{
+    content:'';
+    position:absolute;
+    left:12px;
+    right:12px;
+    bottom:4px;
+    height:2px;
+    background:linear-gradient(90deg,var(--primary),var(--secondary));
+    transform:scaleX(0);
+    transform-origin:left center;
+    transition:transform .25s ease;
+}
+.nav-link:hover::after{ transform:scaleX(1); }
+
+.cta-button{
+    display:inline-block;
+    background:linear-gradient(90deg,var(--primary),var(--secondary));
+    color:white !important;
+    padding:8px 14px;
+    border-radius:999px;
+    box-shadow:0 8px 20px rgba(217,119,6,.12);
+    transition:transform .18s ease, box-shadow .18s ease;
+}
+.cta-button:hover{ transform:translateY(-3px); box-shadow:0 18px 40px rgba(217,119,6,.18); }
+
+/* Mobile menu styles */
+#mobileMenu{ box-shadow:0 10px 30px rgba(0,0,0,.06); }
+
+
+/* Complex additions: gradients, glass cards, extra animations */
+
+@keyframes floatSlow{
+  0%{ transform: translateY(0) }
+  50%{ transform: translateY(-12px) }
+ 100%{ transform: translateY(0) }
+}
+
+.animate-float-slow{ animation: floatSlow 6s ease-in-out infinite; }
+
+.glass-card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.55));
+    border-radius:18px;
+    padding:18px;
+    box-shadow: 0 20px 50px rgba(16,24,40,0.08);
+    border:1px solid rgba(255,255,255,0.6);
+    backdrop-filter: blur(8px) saturate(120%);
+}
+
+.hero-gradient-overlay{
+    position:absolute;
+    inset:0;
+    background: radial-gradient(800px 400px at 10% 20%, rgba(245,158,11,0.14), transparent 15%),
+                radial-gradient(700px 350px at 90% 80%, rgba(217,119,6,0.12), transparent 12%);
+    pointer-events:none;
+}
+
+.card-tilt{
+    transform: perspective(800px) rotateX(0deg) rotateY(0deg);
+    transition: transform .45s cubic-bezier(.2,.9,.3,1), box-shadow .45s;
+}
+.card-tilt:hover{
+    transform: perspective(800px) rotateX(6deg) rotateY(-6deg) translateY(-6px);
+}
+
+.badge-pulse{
+    display:inline-block;
+    padding:6px 10px;
+    border-radius:999px;
+    background:linear-gradient(90deg,#fff7ed,#fff3e0);
+    color:var(--primary);
+    box-shadow:0 8px 30px rgba(217,119,6,0.08);
+    animation: badgeGlow 2.5s infinite;
+}
+
+@keyframes badgeGlow{
+ 0%{ box-shadow:0 6px 20px rgba(217,119,6,0.06) }
+ 50%{ box-shadow:0 18px 50px rgba(217,119,6,0.10) }
+ 100%{ box-shadow:0 6px 20px rgba(217,119,6,0.06) }
+}
+
+/* responsive tweaks */
+@media (max-width: 768px){
+    .stitch-frame{ padding:10px; }
+    .stitch-frame img{ height:320px; }
+}
