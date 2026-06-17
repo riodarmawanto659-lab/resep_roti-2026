@@ -1,252 +1,88 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Resep Roti</title>
+@extends('layouts.frontend')
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="{{ asset('front/css/style.css') }}">
+@section('title', 'Daftar Resep')
+@section('description', 'Cari daftar resep roti berdasarkan nama resep, deskripsi, dan kategori.')
 
-    @php
-        use Illuminate\Support\Str;
-    @endphp
-</head>
-
-<body class="bg-amber-50 min-h-screen">
-
-    @include('partials.navbar')
-
-    <!-- Hero -->
-    <section class="relative overflow-hidden">
-
-        {{-- Background Hero dari Admin --}}
-        @if(isset($pengaturan) && $pengaturan->gambar_hero)
-
-            <div class="absolute inset-0">
-                <img
-                    src="{{ asset('storage/' . $pengaturan->gambar_hero) }}"
-                    alt="Hero"
-                    class="w-full h-full object-cover">
-            </div>
-
-        @else
-
-            <div class="absolute inset-0 bg-gradient-to-r from-amber-700 via-orange-500 to-yellow-500"></div>
-
-        @endif
-
-        {{-- Overlay --}}
-        <div class="absolute inset-0 bg-gradient-to-b from-black/30 to-white/10"></div>
-
-        <div class="relative max-w-7xl mx-auto px-6 py-24 text-white">
-
-            <div class="max-w-2xl">
-                <span class="stitch-accent">Sistem Manajemen Resep Roti</span>
-
-                <h1 class="text-4xl lg:text-5xl font-extrabold mt-4 mb-4">
-                    {{ $pengaturan?->judul_hero ?? '🍞 Daftar Resep Roti' }}
-                </h1>
-
-                <p class="text-lg text-amber-100 mb-6">
-                    {{ $pengaturan?->subjudul_hero ?? 'Temukan berbagai resep roti terbaik dan inspirasi bakery modern.' }}
-                </p>
-
-                <div class="flex gap-4">
-                    <a href="#list" class="btn-bakery px-5 py-3 rounded-full text-white">Jelajahi Resep</a>
-                    <a href="#newsletter" class="px-5 py-3 rounded-full border border-white/20">Langganan</a>
-                </div>
-            </div>
-
+@section('content')
+<section class="relative overflow-hidden px-5 py-16 lg:px-8 lg:py-20">
+    <div class="hero-blob left-[-8rem] top-10 bg-bread-200/60"></div>
+    <div class="mx-auto max-w-7xl">
+        <div class="max-w-3xl reveal" data-reveal>
+            <span class="eyebrow">Katalog Resep</span>
+            <h1 class="mt-5 font-display text-5xl font-black leading-tight text-bread-900 md:text-6xl">
+                Temukan resep roti yang paling pas untuk dibuat.
+            </h1>
+            <p class="mt-5 text-lg leading-8 text-bread-800/70">
+                Cari berdasarkan nama resep, deskripsi, atau pilih kategori agar proses menemukan resep menjadi lebih cepat dan jelas.
+            </p>
         </div>
-
-    </section>
-<!-- Search -->
-<section class="max-w-7xl mx-auto px-6 -mt-10 relative z-10">
-
-    <div class="bg-white rounded-3xl shadow-2xl p-6">
-
-        <form action="{{ route('resep.index') }}" method="GET">
-
-            <div class="grid md:grid-cols-4 gap-4">
-
-                {{-- Input Search --}}
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Cari resep roti..."
-                    class="md:col-span-2 border-2 border-amber-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-amber-200 focus:border-amber-500">
-
-                {{-- Filter Kategori --}}
-                <select
-                    name="kategori"
-                    class="border-2 border-amber-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-amber-200 focus:border-amber-500">
-
-                    <option value="">
-                        Semua Kategori
-                    </option>
-
-                    @foreach($kategori as $item)
-
-                        <option
-                            value="{{ $item->id }}"
-                            {{ request('kategori') == $item->id ? 'selected' : '' }}>
-
-                            {{ $item->nama }}
-
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-                {{-- Tombol --}}
-                <div class="flex gap-3">
-
-                    <button
-                        type="submit"
-                        class="flex-1 bg-gradient-to-r from-amber-600 to-orange-500 text-white px-6 py-4 rounded-2xl font-bold hover:scale-105 transition">
-
-                        🔍 Cari
-
-                    </button>
-
-                    <a
-                        href="{{ route('resep.index') }}"
-                        class="bg-gray-100 px-6 py-4 rounded-2xl hover:bg-gray-200 flex items-center justify-center">
-
-                        Reset
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        </form>
-
-        {{-- Info Filter --}}
-        @if(request('search') || request('kategori'))
-
-            <div class="mt-4 text-sm text-gray-600">
-
-                Menampilkan hasil
-
-                @if(request('search'))
-                    untuk:
-                    <span class="font-semibold text-amber-600">
-                        "{{ request('search') }}"
-                    </span>
-                @endif
-
-                @if(request('kategori'))
-                    pada kategori yang dipilih
-                @endif
-
-            </div>
-
-        @endif
-
     </div>
-
 </section>
 
-    <!-- Daftar Resep -->
-    <section id="list" class="max-w-7xl mx-auto px-6 mt-12 pb-20">
+<section class="relative z-10 -mt-6 px-5 lg:px-8">
+    <div class="mx-auto max-w-7xl">
+        <form action="{{ route('resep.index') }}" method="GET" class="search-panel reveal" data-reveal>
+            <div class="grid gap-4 lg:grid-cols-[1.4fr_.8fr_auto_auto]">
+                <label class="sr-only" for="search">Cari resep</label>
+                <input id="search" type="text" name="search" value="{{ request('search') }}" placeholder="Cari contoh: roti sobek, donat, pastry..." class="bakery-input">
 
-        @if($reseps->count())
+                <label class="sr-only" for="kategori">Kategori</label>
+                <select id="kategori" name="kategori" class="bakery-input">
+                    <option value="">Semua Kategori</option>
+                    @foreach($kategori as $item)
+                        <option value="{{ $item->id }}" @selected((string) request('kategori') === (string) $item->id)>{{ $item->nama }}</option>
+                    @endforeach
+                </select>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-                @foreach($reseps as $resep)
-
-                    <article class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition duration-300 card-tilt">
-
-                        <div class="relative h-64 overflow-hidden">
-                            @if($resep->gambar)
-                                <img src="{{ asset('storage/' . $resep->gambar) }}" alt="{{ $resep->nama }}" class="w-full h-full object-cover">
-                            @else
-                                <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200" alt="Default Roti" class="w-full h-full object-cover">
-                            @endif
-
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-
-                            <div class="absolute left-4 bottom-4 text-white">
-                                <h3 class="text-xl font-bold">{{ $resep->nama }}</h3>
-                                <div class="text-sm text-white/80">{{ Str::limit(strip_tags($resep->deskripsi), 80) }}</div>
-                            </div>
-
-                            <div class="absolute top-4 right-4">
-                                <span class="px-3 py-1 rounded-full text-xs bg-amber-100 text-amber-700">{{ $resep->kategori->nama ?? 'Umum' }}</span>
-                            </div>
-                        </div>
-
-                        <div class="p-6">
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="text-sm text-gray-500 flex items-center gap-3">
-                                    @if($resep->waktu_pembuatan)
-                                        <span class="flex items-center gap-2">⏱ <span>{{ $resep->waktu_pembuatan }} m</span></span>
-                                    @endif
-                                    @if($resep->porsi)
-                                        <span class="flex items-center gap-2">🍽 <span>{{ $resep->porsi }} porsi</span></span>
-                                    @endif
-                                </div>
-                                <a href="{{ route('resep.show', $resep->slug) }}" class="text-amber-600 font-semibold">Lihat →</a>
-                            </div>
-
-                            <p class="text-sm text-gray-600 mb-4">{{ Str::limit(strip_tags($resep->deskripsi), 120) }}</p>
-
-                            <div class="flex items-center gap-3">
-                                <a href="{{ route('resep.show', $resep->slug) }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-amber-100 hover:bg-amber-50">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                                    Detail
-                                </a>
-                                <button class="ml-auto text-xs px-3 py-1 rounded-full bg-amber-100 text-amber-700">Simpan</button>
-                            </div>
-                        </div>
-
-                    </article>
-
-                @endforeach
-
+                <button type="submit" class="btn-bakery px-6 py-3">Cari</button>
+                <a href="{{ route('resep.index') }}" class="btn-outline-bakery px-6 py-3 text-center">Reset</a>
             </div>
 
-            <!-- Pagination -->
-            <div class="mt-12 flex items-center justify-center">
-                {{ $reseps->links() }}
-            </div>
-
-        @else
-
-            <div class="bg-white p-12 rounded-3xl shadow-lg text-center">
-
-                <div class="text-6xl mb-4">
-                    🔍
+            @if(request('search') || request('kategori'))
+                <div class="mt-5 flex flex-wrap gap-2 text-sm text-bread-700/80">
+                    <span class="meta-pill">Menampilkan hasil filter</span>
+                    @if(request('search'))
+                        <span class="meta-pill">Keyword: “{{ request('search') }}”</span>
+                    @endif
+                    @if(isset($selectedKategori) && $selectedKategori)
+                        <span class="meta-pill">Kategori: {{ $selectedKategori->nama }}</span>
+                    @endif
                 </div>
+            @endif
+        </form>
+    </div>
+</section>
 
-                <h2 class="text-3xl font-bold text-gray-700">
-                    Resep Tidak Ditemukan
+<section id="list" class="px-5 py-14 lg:px-8">
+    <div class="mx-auto max-w-7xl">
+        <div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+                <span class="eyebrow">Hasil Resep</span>
+                <h2 class="mt-3 font-display text-4xl font-black text-bread-900">
+                    {{ $reseps->total() }} resep ditemukan
                 </h2>
-
-                <p class="text-gray-500 mt-3">
-                    Tidak ada resep yang sesuai dengan pencarian Anda.
-                </p>
-
             </div>
-
-        @endif
-
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8">
-
-        <div class="text-center">
-            © {{ date('Y') }} Sistem Resep Roti - Laravel & Filament
+            <p class="max-w-md text-sm leading-6 text-bread-700/70">Klik kartu resep untuk melihat bahan, porsi, waktu, dan langkah pembuatan lengkap.</p>
         </div>
 
-    </footer>
+        @if($reseps->count())
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                @foreach($reseps as $resep)
+                    @include('partials.recipe-card', ['resep' => $resep])
+                @endforeach
+            </div>
 
-</body>
-</html>
+            <div class="pagination-wrap mt-12">
+                {{ $reseps->links() }}
+            </div>
+        @else
+            <div class="empty-state reveal" data-reveal>
+                <div class="text-6xl">🔍</div>
+                <h3 class="mt-4 text-2xl font-black text-bread-900">Resep tidak ditemukan</h3>
+                <p class="mt-3 text-bread-700/70">Coba gunakan kata kunci yang lebih umum atau hapus filter kategori.</p>
+                <a href="{{ route('resep.index') }}" class="btn-bakery mt-6 inline-block px-6 py-3">Lihat Semua Resep</a>
+            </div>
+        @endif
+    </div>
+</section>
+@endsection

@@ -2,25 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bahan;
+use App\Models\Kategori;
 use App\Models\PengaturanWebsite;
 use App\Models\Resep;
-use App\Models\Kategori;
-use App\Models\Bahan;
+use Illuminate\Http\Request;
+
 class FrontendController extends Controller
 {
     public function home()
     {
-        $totalResep = Resep::count();
+        $pengaturan = PengaturanWebsite::query()->first();
+
+        $totalResep = Resep::published()->count();
         $totalKategori = Kategori::count();
         $totalBahan = Bahan::count();
 
-        $kategori = Kategori::latest()->get();
+        $kategori = Kategori::query()
+            ->withCount(['reseps' => fn ($query) => $query->published()])
+            ->orderBy('nama')
+            ->get();
 
-        $reseps = Resep::latest()
+        $reseps = Resep::query()
+            ->published()
+            ->with('kategori')
+            ->latest()
             ->take(6)
             ->get();
 
         return view('welcome', compact(
+            'pengaturan',
             'totalResep',
             'totalKategori',
             'totalBahan',
@@ -29,60 +40,76 @@ class FrontendController extends Controller
         ));
     }
 
-   public function resep()
-{
-    $search = request('search');
-    $kategoriId = request('kategori');
-
-    $pengaturan = PengaturanWebsite::first();
-
-    $reseps = Resep::with('kategori')
-
-        ->when($search, function ($query) use ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('deskripsi', 'like', "%{$search}%");
-            });
-        })
-
-        ->when($kategoriId, function ($query) use ($kategoriId) {
-            $query->where('kategori_id', $kategoriId);
-        })
-
-        ->latest()
-        ->paginate(6)
-        ->withQueryString();
-
-    $kategori = Kategori::orderBy('nama')->get();
-
-    return view('frontend.resep', compact(
-        'reseps',
-        'pengaturan',
-        'kategori'
-    ));
-}
-    public function detailResep($slug)
-{
-    $resep = Resep::where('slug', $slug)
-                ->with([
-                    'kategori',
-                    'detailReseps.bahan'
-                ])
-                ->firstOrFail();
-
-    return view('frontend.detail-resep', compact('resep'));
-}
-    public function kategori($slug)
+    public function resep(Request $request)
     {
-        $kategori = Kategori::where('slug', $slug)
-                        ->firstOrFail();
+        $search = trim((string) $request->query('search', ''));
+        $kategoriId = $request->query('kategori');
+        $pengaturan = PengaturanWebsite::query()->first();
 
-        $reseps = Resep::where('kategori_id', $kategori->id)
-                    ->paginate(12);
+        $kategori = Kategori::query()
+            ->withCount(['reseps' => fn ($query) => $query->published()])
+            ->orderBy('nama')
+            ->get();
 
-        return view(
-            'frontend.kategori',
-            compact('kategori', 'reseps')
-        );
+        $selectedKategori = $kategoriId
+            ? Kategori::query()->whereKey($kategoriId)->first()
+            : null;
+
+        $reseps = Resep::query()
+            ->published()
+            ->with('kategori')
+            ->search($search)
+            ->byKategori($kategoriId)
+            ->latest()
+            ->paginate(9)
+            ->withQueryString();
+
+        return view('frontend.resep', compact(
+            'reseps',
+            'pengaturan',
+            'kategori',
+            'selectedKategori',
+            'search'
+        ));
+    }
+
+    public function detailResep(string $slug)
+    {
+        $pengaturan = PengaturanWebsite::query()->first();
+
+        $resep = Resep::query()
+            ->published()
+            ->where('slug', $slug)
+            ->with(['kategori', 'detailReseps.bahan'])
+            ->firstOrFail();
+
+        $related = Resep::query()
+            ->published()
+            ->with('kategori')
+            ->where('kategori_id', $resep->kategori_id)
+            ->whereKeyNot($resep->id)
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return view('frontend.detail-resep', compact('pengaturan', 'resep', 'related'));
+    }
+
+    public function kategori(string $slug)
+    {
+        $pengaturan = PengaturanWebsite::query()->first();
+
+        $kategori = Kategori::query()
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        $reseps = $kategori->reseps()
+            ->published()
+            ->with('kategori')
+            ->latest()
+            ->paginate(9)
+            ->withQueryString();
+
+        return view('frontend.kategori', compact('pengaturan', 'kategori', 'reseps'));
     }
 }

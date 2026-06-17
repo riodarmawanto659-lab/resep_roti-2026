@@ -17,8 +17,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,
             KategoriSeeder::class,
-            ResepSeeder::class,
             BahanSeeder::class,
+            ResepSeeder::class,
             DetailResepSeeder::class,
             PengaturanWebsiteSeeder::class,
 

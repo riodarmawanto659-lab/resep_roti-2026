@@ -1,134 +1,53 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kategori {{ $kategori->nama }}</title>
+@extends('layouts.frontend')
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-amber-50 min-h-screen">
+@section('title', 'Kategori ' . $kategori->nama)
+@section('description', 'Daftar resep roti dalam kategori ' . $kategori->nama . '.')
 
-    @include('partials.navbar')
+@section('content')
+<section class="relative overflow-hidden px-5 py-16 lg:px-8 lg:py-20">
+    <div class="hero-blob right-[-8rem] top-10 bg-bread-200/60"></div>
+    <div class="mx-auto max-w-7xl">
+        <div class="max-w-3xl reveal" data-reveal>
+            <span class="eyebrow">Kategori Resep</span>
+            <h1 class="mt-5 font-display text-5xl font-black leading-tight text-bread-900 md:text-6xl">{{ $kategori->nama }}</h1>
+            <p class="mt-5 text-lg leading-8 text-bread-800/70">
+                {{ $kategori->deskripsi ?: 'Menampilkan semua resep yang termasuk dalam kategori ini.' }}
+            </p>
+            <div class="mt-7 flex flex-wrap gap-3">
+                <a href="{{ route('resep.index') }}" class="btn-outline-bakery px-5 py-3">Semua Resep</a>
+                <a href="{{ route('resep.index', ['kategori' => $kategori->id]) }}" class="btn-bakery px-5 py-3">Filter di Katalog</a>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <!-- Header -->
-    <section class="max-w-7xl mx-auto px-6 py-12">
-
-        <span class="bg-amber-100 text-amber-700 px-4 py-2 rounded-full">
-            Kategori
-        </span>
-
-        <h1 class="text-5xl font-bold mt-4">
-            {{ $kategori->nama }}
-        </h1>
-
-        <p class="text-gray-600 mt-3">
-            Menampilkan semua resep dalam kategori ini.
-        </p>
-
-    </section>
-
-    <!-- List Resep -->
-    <section class="max-w-7xl mx-auto px-6 pb-20">
-
+<section class="px-5 pb-20 lg:px-8">
+    <div class="mx-auto max-w-7xl">
         @if($reseps->count())
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-                @foreach($reseps as $resep)
-
-                    <a href="{{ route('resep.show', $resep->slug) }}"
-                       class="block bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1 transition duration-300">
-
-                        {{-- Gambar --}}
-                        @if($resep->gambar)
-
-                            <img
-                                src="{{ asset('storage/'.$resep->gambar) }}"
-                                alt="{{ $resep->nama }}"
-                                class="w-full h-56 object-cover">
-
-                        @else
-
-                            <img
-                                src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200"
-                                alt="{{ $resep->nama }}"
-                                class="w-full h-56 object-cover">
-
-                        @endif
-
-                        <div class="p-6">
-
-                            <h2 class="text-2xl font-bold">
-                                {{ $resep->nama }}
-                            </h2>
-
-                            <p class="text-gray-600 mt-3">
-                                {{ \Illuminate\Support\Str::limit(strip_tags($resep->deskripsi), 100) }}
-                            </p>
-
-                            <div class="mt-4 flex gap-4 text-sm text-gray-500">
-
-                                @if($resep->waktu_pembuatan)
-                                    <span>
-                                        ⏱ {{ $resep->waktu_pembuatan }} menit
-                                    </span>
-                                @endif
-
-                                @if($resep->porsi)
-                                    <span>
-                                        🍽 {{ $resep->porsi }} porsi
-                                    </span>
-                                @endif
-
-                            </div>
-
-                            <div class="mt-6 text-amber-600 font-semibold">
-                                Klik untuk melihat detail →
-                            </div>
-
-                        </div>
-
-                    </a>
-
-                @endforeach
-
+            <div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+                <div>
+                    <span class="eyebrow">Daftar Resep</span>
+                    <h2 class="mt-3 font-display text-4xl font-black text-bread-900">{{ $reseps->total() }} resep tersedia</h2>
+                </div>
             </div>
 
-            <div class="mt-10">
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                @foreach($reseps as $resep)
+                    @include('partials.recipe-card', ['resep' => $resep])
+                @endforeach
+            </div>
+
+            <div class="pagination-wrap mt-12">
                 {{ $reseps->links() }}
             </div>
-
         @else
-
-            <div class="bg-white rounded-3xl shadow p-12 text-center">
-
-                <div class="text-6xl mb-4">
-                    📂
-                </div>
-
-                <h2 class="text-3xl font-bold">
-                    Belum Ada Resep
-                </h2>
-
-                <p class="text-gray-500 mt-3">
-                    Tidak ada resep dalam kategori ini.
-                </p>
-
+            <div class="empty-state reveal" data-reveal>
+                <div class="text-6xl">📂</div>
+                <h3 class="mt-4 text-2xl font-black text-bread-900">Belum ada resep</h3>
+                <p class="mt-3 text-bread-700/70">Kategori ini belum memiliki resep yang dipublikasikan.</p>
+                <a href="{{ route('resep.index') }}" class="btn-bakery mt-6 inline-block px-6 py-3">Kembali ke Katalog</a>
             </div>
-
         @endif
-
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8">
-
-        <div class="text-center">
-            © {{ date('Y') }} Sistem Resep Roti
-        </div>
-
-    </footer>
-
-</body>
-</html>
+    </div>
+</section>
+@endsection

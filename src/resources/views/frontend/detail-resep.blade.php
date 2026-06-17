@@ -1,152 +1,151 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $resep->nama }}</title>
+@extends('layouts.frontend')
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="{{ asset('front/css/style.css') }}">
-</head>
+@section('title', $resep->nama)
+@section('description', \Illuminate\Support\Str::limit(strip_tags((string) $resep->deskripsi), 150))
 
-<body class="bg-amber-50 min-h-screen">
+@section('content')
+@php
+    use Illuminate\Support\Str;
 
-    @include('partials.navbar')
+    $image = $resep->gambar ? asset('storage/'.$resep->gambar) : asset('front/img/recipe-placeholder.svg');
+    $caraPlain = trim(strip_tags((string) $resep->cara_pembuatan));
+    $steps = collect(preg_split('/\r\n|\r|\n/', $caraPlain))
+        ->map(fn ($step) => trim(preg_replace('/^\d+[\.)\-\s]+/', '', $step)))
+        ->filter()
+        ->values();
+@endphp
 
-    <!-- Main content -->
-    <main class="max-w-7xl mx-auto px-6 py-12">
+<section class="relative overflow-hidden px-5 py-10 lg:px-8 lg:py-16">
+    <div class="mx-auto max-w-7xl">
+        <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('resep.index') }}" class="mb-6 inline-flex items-center gap-2 text-sm font-bold text-caramel hover:text-bread-700">← Kembali</a>
 
-        <div class="grid lg:grid-cols-3 gap-8">
+        <div class="grid gap-8 lg:grid-cols-[1.05fr_.95fr] lg:items-center">
+            <div class="reveal" data-reveal>
+                @if($resep->kategori)
+                    <a href="{{ route('kategori.show', $resep->kategori->slug) }}" class="eyebrow">{{ $resep->kategori->nama }}</a>
+                @else
+                    <span class="eyebrow">Resep Roti</span>
+                @endif
+                <h1 class="mt-5 font-display text-5xl font-black leading-tight text-bread-900 md:text-6xl">{{ $resep->nama }}</h1>
+                <p class="mt-5 max-w-2xl text-lg leading-8 text-bread-800/70">{{ $resep->deskripsi ?: 'Resep roti dengan bahan dan cara pembuatan yang mudah diikuti.' }}</p>
 
-            <!-- Left: main article -->
-            <article class="lg:col-span-2">
-                <div class="bg-white rounded-2xl overflow-hidden shadow-xl">
-                    @if($resep->gambar)
-                        <img src="{{ asset('storage/'.$resep->gambar) }}" alt="{{ $resep->nama }}" class="w-full h-[520px] object-cover">
-                    @else
-                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1600" alt="{{ $resep->nama }}" class="w-full h-[520px] object-cover">
+                <div class="mt-7 flex flex-wrap gap-3">
+                    @if($resep->waktu_pembuatan)
+                        <span class="meta-pill">⏱ {{ $resep->waktu_pembuatan }} menit</span>
                     @endif
+                    @if($resep->porsi)
+                        <span class="meta-pill">🍽 {{ $resep->porsi }} porsi</span>
+                    @endif
+                    <span class="meta-pill">📌 Dipublikasikan</span>
+                </div>
 
-                    <div class="p-10">
-                        <div class="flex items-start justify-between gap-6">
-                            <div>
-                                @if($resep->kategori)
-                                    <a href="{{ route('kategori.show', $resep->kategori->slug) }}" class="inline-block bg-amber-100 text-amber-700 px-4 py-2 rounded-full">{{ $resep->kategori->nama }}</a>
-                                @endif
+                <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                    <button type="button" class="btn-bakery js-save-recipe px-6 py-3" data-recipe="{{ $resep->id }}">♡ Simpan Resep</button>
+                    <button type="button" class="btn-outline-bakery js-copy-link px-6 py-3">Salin Link</button>
+                    <button type="button" onclick="window.print()" class="btn-outline-bakery px-6 py-3">Cetak</button>
+                </div>
+            </div>
 
-                                <h1 class="text-4xl lg:text-5xl font-extrabold mt-4">{{ $resep->nama }}</h1>
+            <div class="relative reveal" data-reveal data-parallax="0.04">
+                <div class="detail-image-wrap">
+                    <img src="{{ $image }}" alt="{{ $resep->nama }}" class="h-[28rem] w-full rounded-[2rem] object-cover shadow-bakery">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-                                <div class="mt-4 flex flex-wrap gap-4 text-gray-600">
-                                    @if($resep->waktu_pembuatan)
-                                        <div class="flex items-center gap-2">⏱ <span class="font-medium">{{ $resep->waktu_pembuatan }} menit</span></div>
-                                    @endif
-                                    @if($resep->porsi)
-                                        <div class="flex items-center gap-2">🍽 <span class="font-medium">{{ $resep->porsi }} porsi</span></div>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div class="flex flex-col items-end gap-3">
-                                <button class="btn-bakery px-5 py-2 rounded-full text-white">Simpan Resep</button>
-                                <div class="flex gap-2">
-                                    <button onclick="navigator.clipboard.writeText(window.location.href)" class="px-3 py-2 rounded-lg bg-gray-100">Salin Link</button>
-                                    <a href="javascript:window.print()" class="px-3 py-2 rounded-lg bg-gray-100">Cetak</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        @if($resep->deskripsi)
-                            <div class="mt-8 prose max-w-none text-gray-700">{{ $resep->deskripsi }}</div>
-                        @endif
+<section class="px-5 pb-16 lg:px-8">
+    <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_22rem]">
+        <article class="space-y-8">
+            <div class="content-card reveal" data-reveal>
+                <div class="mb-6 flex items-center gap-3">
+                    <span class="section-icon">👨‍🍳</span>
+                    <div>
+                        <span class="eyebrow">Step by Step</span>
+                        <h2 class="mt-1 font-display text-3xl font-black text-bread-900">Cara Pembuatan</h2>
                     </div>
                 </div>
 
-                <!-- Steps / Cara Pembuatan -->
-                <div class="bg-white rounded-2xl shadow-xl mt-8 p-10">
-                    <h2 class="text-2xl font-bold mb-6">👨‍🍳 Cara Pembuatan</h2>
-                    @if($resep->cara_pembuatan)
-                        <div class="prose max-w-none">{!! $resep->cara_pembuatan !!}</div>
-                    @else
-                        <p class="text-gray-500">Cara pembuatan belum tersedia.</p>
-                    @endif
+                @if($steps->count() > 1)
+                    <ol class="space-y-4">
+                        @foreach($steps as $index => $step)
+                            <li class="step-item">
+                                <span>{{ $index + 1 }}</span>
+                                <p>{{ $step }}</p>
+                            </li>
+                        @endforeach
+                    </ol>
+                @elseif($steps->count() === 1)
+                    <p class="leading-8 text-bread-800/75">{{ $steps->first() }}</p>
+                @else
+                    <p class="leading-8 text-bread-800/60">Cara pembuatan belum tersedia.</p>
+                @endif
+            </div>
+
+            <div class="content-card reveal" data-reveal>
+                <div class="mb-6 flex items-center gap-3">
+                    <span class="section-icon">💡</span>
+                    <div>
+                        <span class="eyebrow">Catatan Produksi</span>
+                        <h2 class="mt-1 font-display text-3xl font-black text-bread-900">Tips Membaca Resep</h2>
+                    </div>
                 </div>
+                <div class="grid gap-4 md:grid-cols-3">
+                    <div class="tip-card"><strong>Siapkan bahan</strong><p>Timbang bahan sebelum mulai agar proses lebih cepat.</p></div>
+                    <div class="tip-card"><strong>Ikuti urutan</strong><p>Jangan melewati proses fermentasi atau resting adonan.</p></div>
+                    <div class="tip-card"><strong>Catat hasil</strong><p>Simpan perubahan takaran untuk produksi berikutnya.</p></div>
+                </div>
+            </div>
 
-                <!-- Related recipes -->
-                <div class="mt-8">
-                    <h3 class="text-xl font-semibold mb-4">Resep Serupa</h3>
-                    <div class="grid md:grid-cols-3 gap-4">
-                        @php
-                            use App\Models\Resep as ResepModel;
-                            $related = ResepModel::where('kategori_id', $resep->kategori_id)->where('id','!=',$resep->id)->take(3)->get();
-                        @endphp
-
-                        @foreach($related as $r)
-                            <a href="{{ route('resep.show', $r->slug) }}" class="block bg-white rounded-xl shadow p-3 hover:shadow-md transition">
-                                <div class="h-36 overflow-hidden rounded-md mb-3">
-                                    @if($r->gambar)
-                                        <img src="{{ asset('storage/'.$r->gambar) }}" alt="{{ $r->nama }}" class="w-full h-full object-cover">
-                                    @else
-                                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=900" alt="{{ $r->nama }}" class="w-full h-full object-cover">
-                                    @endif
-                                </div>
-                                <div class="font-semibold">{{ $r->nama }}</div>
-                                <div class="text-sm text-gray-500">{{ Str::limit(strip_tags($r->deskripsi), 60) }}</div>
-                            </a>
+            @if(isset($related) && $related->count())
+                <div class="reveal" data-reveal>
+                    <div class="mb-6 flex items-end justify-between gap-4">
+                        <div>
+                            <span class="eyebrow">Resep Serupa</span>
+                            <h2 class="mt-2 font-display text-3xl font-black text-bread-900">Masih dalam kategori yang sama</h2>
+                        </div>
+                    </div>
+                    <div class="grid gap-6 md:grid-cols-3">
+                        @foreach($related as $item)
+                            @include('partials.recipe-card', ['resep' => $item])
                         @endforeach
                     </div>
                 </div>
-            </article>
+            @endif
+        </article>
 
-            <!-- Right: sidebar -->
-            <aside class="space-y-6">
-                <div class="glass-card rounded-2xl p-6">
-                    <h4 class="font-semibold mb-3">Bahan</h4>
-                    @if($resep->detailReseps->count())
-                        <ul class="space-y-2 text-sm">
-                            @foreach($resep->detailReseps as $d)
-                                <li class="flex justify-between">
-                                    <div>{{ $d->bahan?->nama ?? '-' }}</div>
-                                    <div class="text-gray-600">{{ $d->jumlah }} {{ $d->bahan?->satuan ?? '' }}</div>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @else
-                        <p class="text-gray-500 text-sm">Belum ada bahan terdaftar.</p>
-                    @endif
+        <aside class="space-y-6 lg:sticky lg:top-28 lg:self-start">
+            <div class="content-card reveal" data-reveal>
+                <div class="mb-5 flex items-center justify-between gap-3">
+                    <h3 class="font-display text-2xl font-black text-bread-900">Bahan</h3>
+                    <span class="chip-light">{{ $resep->detailReseps->count() }} item</span>
                 </div>
 
-                <div class="glass-card rounded-2xl p-6">
-                    <h4 class="font-semibold mb-3">Info Resep</h4>
-                    <dl class="text-sm text-gray-600 space-y-2">
-                        <div class="flex justify-between"><dt>Waktu</dt><dd>{{ $resep->waktu_pembuatan ?? '-' }} menit</dd></div>
-                        <div class="flex justify-between"><dt>Porsi</dt><dd>{{ $resep->porsi ?? '-' }}</dd></div>
-                        <div class="flex justify-between"><dt>Status</dt><dd>{{ $resep->status ? 'Publik' : 'Draft' }}</dd></div>
-                    </dl>
-                </div>
+                @if($resep->detailReseps->count())
+                    <ul class="space-y-3">
+                        @foreach($resep->detailReseps as $detail)
+                            <li class="ingredient-item">
+                                <span>{{ $detail->bahan?->nama ?? '-' }}</span>
+                                <strong>{{ $detail->jumlah }} {{ $detail->bahan?->satuan ?? '' }}</strong>
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <p class="text-sm leading-6 text-bread-800/60">Belum ada bahan terdaftar untuk resep ini.</p>
+                @endif
+            </div>
 
-                <div class="bg-white rounded-2xl shadow p-4">
-                    <h4 class="font-semibold mb-3">Bagikan</h4>
-                    <div class="flex gap-2">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->fullUrl()) }}" target="_blank" class="px-3 py-2 rounded-md bg-blue-600 text-white">Facebook</a>
-                        <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->fullUrl()) }}" target="_blank" class="px-3 py-2 rounded-md bg-sky-500 text-white">Twitter</a>
-                    </div>
-                </div>
-            </aside>
-
-        </div>
-
-    </main>
-
-    <!-- (Removed duplicated bottom ingredient and steps sections — content now in main article and sidebar) -->
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8">
-
-        <div class="text-center">
-            © {{ date('Y') }} Sistem Resep Roti
-        </div>
-
-    </footer>
-
-</body>
-</html>
+            <div class="content-card reveal" data-reveal>
+                <h3 class="font-display text-2xl font-black text-bread-900">Info Resep</h3>
+                <dl class="mt-5 space-y-3 text-sm">
+                    <div class="info-row"><dt>Waktu</dt><dd>{{ $resep->waktu_pembuatan ? $resep->waktu_pembuatan.' menit' : '-' }}</dd></div>
+                    <div class="info-row"><dt>Porsi</dt><dd>{{ $resep->porsi ?: '-' }}</dd></div>
+                    <div class="info-row"><dt>Kategori</dt><dd>{{ $resep->kategori?->nama ?? '-' }}</dd></div>
+                    <div class="info-row"><dt>Status</dt><dd>{{ $resep->status ? 'Publik' : 'Draft' }}</dd></div>
+                </dl>
+            </div>
+        </aside>
+    </div>
+</section>
+@endsection

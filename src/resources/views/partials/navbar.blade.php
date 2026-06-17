@@ -1,43 +1,49 @@
 @php
     use App\Models\Kategori as KategoriModel;
 
-    // Use passed $kategori if available, otherwise fetch a small set
-    $_navKategori = $kategori ?? KategoriModel::orderBy('nama')->take(6)->get();
+    $site = $pengaturan ?? null;
+    $siteName = $site?->nama_website ?: 'Roti Mix';
+    $navKategori = $navKategori ?? KategoriModel::orderBy('nama')->take(5)->get();
 @endphp
 
-<header class="sticky top-0 z-50 bg-white/60 backdrop-blur-sm border-b">
-    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-        <a href="{{ url('/') }}" class="flex items-center gap-3 group">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center text-white font-bold shadow-md transition-transform group-hover:scale-105">🍞</div>
-            <div>
-                <div class="text-lg font-semibold text-amber-800">Sistem Resep Roti</div>
-                <div class="text-xs text-gray-500">Manajemen resep & produksi</div>
-            </div>
+<header id="siteHeader" class="site-header">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+        <a href="{{ url('/') }}" class="brand-link" aria-label="Beranda {{ $siteName }}">
+            <span class="brand-mark">🍞</span>
+            <span class="leading-tight">
+                <span class="block text-base font-black tracking-tight text-bread-900 md:text-lg">{{ $siteName }}</span>
+                <span class="hidden text-xs font-medium text-bread-600 sm:block">Resep, bahan, dan proses bakery</span>
+            </span>
         </a>
 
-        <nav class="hidden md:flex items-center gap-6">
-            <a href="{{ route('resep.index') }}" class="nav-link">Semua Resep</a>
-            @foreach($_navKategori as $k)
-                <a href="{{ route('kategori.show', $k->slug) }}" class="nav-link">{{ $k->nama }}</a>
+        <nav class="hidden items-center gap-1 lg:flex" aria-label="Navigasi utama">
+            <a href="{{ url('/') }}" class="nav-link {{ request()->is('/') ? 'active' : '' }}">Beranda</a>
+            <a href="{{ route('resep.index') }}" class="nav-link {{ request()->routeIs('resep.*') ? 'active' : '' }}">Semua Resep</a>
+            @foreach($navKategori as $k)
+                <a href="{{ route('kategori.show', $k->slug) }}" class="nav-link {{ request()->is('kategori/'.$k->slug) ? 'active' : '' }}">{{ $k->nama }}</a>
             @endforeach
-            <a href="#newsletter" class="cta-button">Gabung</a>
         </nav>
 
-        <div class="md:hidden flex items-center gap-2">
-            <button id="mobileMenuBtn" aria-expanded="false" aria-controls="mobileMenu" class="p-2 rounded-md bg-white/40 shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-            </button>
+        <div class="hidden items-center gap-3 lg:flex">
+            <a href="{{ route('resep.index') }}?search=" class="btn-outline-bakery px-4 py-2 text-sm">Cari Resep</a>
+            <a href="#kontak" class="btn-bakery px-4 py-2 text-sm">Kontak</a>
         </div>
+
+        <button id="mobileMenuBtn" type="button" class="mobile-menu-button lg:hidden" aria-expanded="false" aria-controls="mobileMenu" aria-label="Buka menu navigasi">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </div>
 
-    <!-- Mobile menu -->
-    <div id="mobileMenu" class="md:hidden hidden bg-white/95 border-t">
-        <div class="px-4 py-4 space-y-2">
-            <a href="{{ route('resep.index') }}" class="block px-3 py-2 rounded-md nav-link">Semua Resep</a>
-            @foreach($_navKategori as $k)
-                <a href="{{ route('kategori.show', $k->slug) }}" class="block px-3 py-2 rounded-md nav-link">{{ $k->nama }}</a>
+    <div id="mobileMenu" class="mobile-menu hidden lg:hidden">
+        <div class="mx-auto max-w-7xl space-y-2 px-5 pb-5">
+            <a href="{{ url('/') }}" class="mobile-nav-link">Beranda</a>
+            <a href="{{ route('resep.index') }}" class="mobile-nav-link">Semua Resep</a>
+            @foreach($navKategori as $k)
+                <a href="{{ route('kategori.show', $k->slug) }}" class="mobile-nav-link">{{ $k->nama }}</a>
             @endforeach
-            <a href="#newsletter" class="block mt-2 px-3 py-2 rounded-md cta-button text-center">Gabung</a>
+            <a href="#kontak" class="btn-bakery mt-3 block px-5 py-3 text-center">Kontak Bakery</a>
         </div>
     </div>
 </header>

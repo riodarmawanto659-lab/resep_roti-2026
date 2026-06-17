@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Kategori;
+use App\Models\PengaturanWebsite;
 use App\Policies\ActivityPolicy;
 use Filament\Actions\MountableAction;
 use Filament\Notifications\Livewire\Notifications;
@@ -10,6 +12,7 @@ use Filament\Pages\Page;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\VerticalAlignment;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\ValidationException;
 use Spatie\Activitylog\Models\Activity;
@@ -41,6 +44,13 @@ class AppServiceProvider extends ServiceProvider
         };
         MountableAction::configureUsing(function (MountableAction $action) {
             $action->modalFooterActionsAlignment(Alignment::Right);
+        });
+
+        View::composer('layouts.frontend', function ($view) {
+            $data = $view->getData();
+
+            $view->with('pengaturan', $data['pengaturan'] ?? PengaturanWebsite::query()->first());
+            $view->with('navKategori', $data['navKategori'] ?? Kategori::query()->orderBy('nama')->take(5)->get());
         });
     }
 }

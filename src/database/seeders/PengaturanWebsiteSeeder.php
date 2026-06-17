@@ -9,16 +9,18 @@ class PengaturanWebsiteSeeder extends Seeder
 {
     public function run(): void
     {
-        PengaturanWebsite::create([
-            'nama_website' => 'Sistem Resep Roti',
-            'logo' => null,
-            'judul_hero' => 'Kumpulan Resep Roti Terbaik',
-            'subjudul_hero' => 'Temukan berbagai resep roti lezat dan mudah dibuat di rumah.',
-            'gambar_hero' => null,
-            'tentang_kami' => 'Website yang menyediakan berbagai resep roti lengkap dan mudah dipahami.',
-            'email' => 'admin@reseproti.com',
-            'telepon' => '081234567890',
-            'alamat' => 'Indonesia',
-        ]);
+        PengaturanWebsite::updateOrCreate(
+            ['nama_website' => 'Roti Mix'],
+            [
+                'logo' => null,
+                'judul_hero' => 'Kumpulan Resep Roti Mix Terbaik',
+                'subjudul_hero' => 'Temukan resep roti, bahan, takaran, dan langkah pembuatan dengan tampilan yang hangat dan modern.',
+                'gambar_hero' => null,
+                'tentang_kami' => 'Roti Mix adalah website manajemen resep roti yang membantu pengguna menyimpan resep, membaca bahan, memilih kategori, dan mengikuti langkah pembuatan secara rapi.',
+                'email' => 'admin@rotimix.local',
+                'telepon' => '0812-3456-7890',
+                'alamat' => 'Indonesia',
+            ]
+        );
     }
 }
